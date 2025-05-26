@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { COLORS, FONT, SPACING, BORDER_RADIUS } from '@/constants/theme';
-import { Search, Users } from 'lucide-react-native';
+import { Search, Users, User } from 'lucide-react-native';
 
 // Mock customer data
 const mockCustomers = [
@@ -11,7 +11,6 @@ const mockCustomers = [
     phone: '+91 98765 43210',
     lastPurchase: '2024-02-15',
     totalAmount: 12500,
-    image: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg',
   },
   {
     id: '2',
@@ -19,7 +18,6 @@ const mockCustomers = [
     phone: '+91 87654 32109',
     lastPurchase: '2024-02-10',
     totalAmount: 8750,
-    image: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg',
   },
   {
     id: '3',
@@ -27,7 +25,6 @@ const mockCustomers = [
     phone: '+91 76543 21098',
     lastPurchase: '2024-02-05',
     totalAmount: 15000,
-    image: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg',
   },
 ];
 
@@ -97,10 +94,9 @@ export default function CustomersScreen() {
             style={styles.customerCard}
             activeOpacity={0.7}
           >
-            <Image
-              source={{ uri: customer.image }}
-              style={styles.customerImage}
-            />
+            <View style={styles.avatarContainer}>
+              <User size={24} color={COLORS.textTertiary} />
+            </View>
             
             <View style={styles.customerInfo}>
               <View style={styles.customerHeader}>
@@ -177,15 +173,19 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: COLORS.borderLight,
+    padding: SPACING.md,
   },
-  customerImage: {
-    width: 80,
-    height: 80,
+  avatarContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: BORDER_RADIUS.round,
     backgroundColor: COLORS.borderLight,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   customerInfo: {
     flex: 1,
-    padding: SPACING.md,
+    marginLeft: SPACING.md,
   },
   customerHeader: {
     marginBottom: SPACING.sm,
