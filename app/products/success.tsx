@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { COLORS, FONT, SPACING, BORDER_RADIUS } from '@/constants/theme';
-import { CheckCircle2, Package, Plus, Home } from 'lucide-react-native';
+import { CircleCheck as CheckCircle2, Package, Plus, Chrome as Home } from 'lucide-react-native';
 
 export default function ProductSuccessScreen() {
   const { name, sku, price, category } = useLocalSearchParams<{
