@@ -1,7 +1,8 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { COLORS, FONT } from '@/constants/theme';
-import { Chrome as Home, ClipboardList, Settings, Package } from 'lucide-react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { COLORS, FONT, BORDER_RADIUS } from '@/constants/theme';
+import { Chrome as Home, ClipboardList, Settings, Package, Users, Plus } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -42,6 +43,28 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="new-transaction"
+        options={{
+          title: '',
+          tabBarIcon: ({ color }) => (
+            <View style={styles.fabContainer}>
+              <TouchableOpacity style={styles.fab} activeOpacity={0.8}>
+                <Plus size={24} color={COLORS.background} />
+              </TouchableOpacity>
+            </View>
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="customers"
+        options={{
+          title: 'Customers',
+          tabBarIcon: ({ color, size }) => (
+            <Users size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="orders"
         options={{
           title: 'Orders',
@@ -62,3 +85,30 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  fabContainer: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    top: -20,
+    height: 60,
+    width: 60,
+  },
+  fab: {
+    backgroundColor: COLORS.primary,
+    height: 56,
+    width: 56,
+    borderRadius: BORDER_RADIUS.round,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: COLORS.shadow,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+});
