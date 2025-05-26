@@ -61,6 +61,7 @@ export default function NewProductScreen() {
   const [videos, setVideos] = useState<string[]>([]);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isDraft, setIsDraft] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Validation
   const validateForm = () => {
@@ -109,7 +110,9 @@ export default function NewProductScreen() {
   };
 
   // Handle form submission
-  const handleSubmit = (asDraft: boolean = false) => {
+  const handleSubmit = async (asDraft: boolean = false) => {
+    if (isSubmitting) return;
+
     if (asDraft) {
       setIsDraft(true);
       // Save as draft logic here
@@ -121,8 +124,28 @@ export default function NewProductScreen() {
       return;
     }
 
-    // Submit form logic here
-    router.back();
+    setIsSubmitting(true);
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Navigate to success screen with product details
+      router.push({
+        pathname: '/products/success',
+        params: {
+          name,
+          sku,
+          price: mrp,
+          category
+        }
+      });
+    } catch (error) {
+      console.error('Error submitting product:', error);
+      // Handle error (show error message, etc.)
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Render error message
@@ -179,6 +202,7 @@ export default function NewProductScreen() {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => router.back()}
+          disabled={isSubmitting}
         >
           <ArrowLeft size={24} color={COLORS.text} />
         </TouchableOpacity>
@@ -200,6 +224,7 @@ export default function NewProductScreen() {
               onChangeText={setName}
               placeholder="Enter product name"
               placeholderTextColor={COLORS.textTertiary}
+              editable={!isSubmitting}
             />
             {renderError('name')}
           </View>
@@ -219,6 +244,7 @@ export default function NewProductScreen() {
                     category === cat && styles.categoryPillSelected,
                   ]}
                   onPress={() => setCategory(cat)}
+                  disabled={isSubmitting}
                 >
                   <Text
                     style={[
@@ -242,6 +268,7 @@ export default function NewProductScreen() {
               onChangeText={setSku}
               placeholder="Enter SKU ID"
               placeholderTextColor={COLORS.textTertiary}
+              editable={!isSubmitting}
             />
             {renderError('sku')}
           </View>
@@ -265,6 +292,7 @@ export default function NewProductScreen() {
               placeholder="Enter MRP"
               keyboardType="numeric"
               placeholderTextColor={COLORS.textTertiary}
+              editable={!isSubmitting}
             />
             {renderError('mrp')}
           </View>
@@ -278,6 +306,7 @@ export default function NewProductScreen() {
               placeholder="Enter discounted price (optional)"
               keyboardType="numeric"
               placeholderTextColor={COLORS.textTertiary}
+              editable={!isSubmitting}
             />
             {renderError('discountedPrice')}
           </View>
@@ -301,6 +330,7 @@ export default function NewProductScreen() {
                     ageGroup === age && styles.categoryPillSelected,
                   ]}
                   onPress={() => setAgeGroup(age)}
+                  disabled={isSubmitting}
                 >
                   <Text
                     style={[
@@ -331,6 +361,7 @@ export default function NewProductScreen() {
                     gender === g && styles.categoryPillSelected,
                   ]}
                   onPress={() => setGender(g)}
+                  disabled={isSubmitting}
                 >
                   <Text
                     style={[
@@ -361,6 +392,7 @@ export default function NewProductScreen() {
               multiline
               numberOfLines={6}
               textAlignVertical="top"
+              editable={!isSubmitting}
             />
             <Text style={styles.characterCount}>
               {description.length}/100 characters minimum
@@ -372,17 +404,31 @@ export default function NewProductScreen() {
 
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.button, styles.draftButton]}
+          style={[
+            styles.button, 
+            styles.draftButton,
+            isSubmitting && styles.buttonDisabled
+          ]}
           onPress={() => handleSubmit(true)}
+          disabled={isSubmitting}
         >
           <Text style={styles.draftButtonText}>Save as Draft</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[styles.button, styles.submitButton]}
+          style={[
+            styles.button, 
+            styles.submitButton,
+            isSubmitting && styles.buttonDisabled
+          ]}
           onPress={() => handleSubmit(false)}
+          disabled={isSubmitting}
         >
-          <Text style={styles.submitButtonText}>Add Product</Text>
+          {isSubmitting ? (
+            <View style={styles.loadingIndicator} />
+          ) : (
+            <Text style={styles.submitButtonText}>Add Product</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -573,6 +619,17 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  buttonDisabled: {
+    opacity: 0.6,
+    ...Platform.select({
+      web: {
+        shadowOpacity: 0,
+      },
+      default: {
+        elevation: 0,
+      },
+    }),
+  },
   draftButton: {
     backgroundColor: COLORS.backgroundSecondary,
     marginRight: SPACING.md,
@@ -589,5 +646,17 @@ const styles = StyleSheet.create({
     fontFamily: FONT.bold,
     fontSize: FONT.size.md,
     color: COLORS.background,
+  },
+  loadingIndicator: {
+    width: 20,
+    height: 20,
+    borderRadius: BORDER_RADIUS.round,
+    borderWidth: 2,
+    borderColor: COLORS.background,
+    borderTopColor: 'transparent',
+    animationKeyframes: 'spin',
+    animationDuration: '1s',
+    animationIterationCount: 'infinite',
+    animationTimingFunction: 'linear',
   },
 });
