@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { COLORS, FONT } from '@/constants/theme';
-import { Chrome as Home, ClipboardList, Settings, ShoppingBag } from 'lucide-react-native';
+import { Chrome as Home, ClipboardList, Settings } from 'lucide-react-native';
 
 export default function TabLayout() {
   return (
@@ -29,15 +29,6 @@ export default function TabLayout() {
           title: 'Dashboard',
           tabBarIcon: ({ color, size }) => (
             <Home size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="products"
-        options={{
-          title: 'Products',
-          tabBarIcon: ({ color, size }) => (
-            <ShoppingBag size={size} color={color} />
           ),
         }}
       />

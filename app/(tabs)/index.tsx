@@ -1,9 +1,14 @@
 import React from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { router } from 'expo-router';
 import { COLORS, FONT, SPACING, BORDER_RADIUS } from '@/constants/theme';
 import { ShoppingBag, ChartBar as BarChart2, Tag, Share2, Plus } from 'lucide-react-native';
 
 export default function DashboardScreen() {
+  const handleAddProduct = () => {
+    router.push('/products/new');
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -41,7 +46,7 @@ export default function DashboardScreen() {
         <View style={styles.actionsSection}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           
-          <TouchableOpacity style={styles.actionButton} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.actionButton} activeOpacity={0.7} onPress={handleAddProduct}>
             <View style={[styles.actionIconContainer, { backgroundColor: COLORS.primary }]}>
               <Plus size={20} color={COLORS.background} />
             </View>
@@ -62,7 +67,7 @@ export default function DashboardScreen() {
             Add products to your store to start showcasing and selling to your customers.
           </Text>
           
-          <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8} onPress={handleAddProduct}>
             <Text style={styles.primaryButtonText}>Add First Product</Text>
           </TouchableOpacity>
         </View>
