@@ -1,12 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { COLORS, FONT, SPACING, BORDER_RADIUS } from '@/constants/theme';
 import { ShoppingBag, ChartBar as BarChart2, Tag, Share2, Plus } from 'lucide-react-native';
 
 export default function DashboardScreen() {
-  const handleAddProduct = () => {
-    router.push('/products/new');
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  const handleAddProduct = async () => {
+    if (isNavigating) return; // Prevent multiple clicks
+
+    try {
+      setIsNavigating(true);
+      await router.push('/products/new');
+    } catch (error) {
+      console.error('Navigation failed:', error);
+      // You could show an error message to the user here
+    } finally {
+      setIsNavigating(false);
+    }
   };
 
   return (
@@ -46,7 +58,12 @@ export default function DashboardScreen() {
         <View style={styles.actionsSection}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
           
-          <TouchableOpacity style={styles.actionButton} activeOpacity={0.7} onPress={handleAddProduct}>
+          <TouchableOpacity 
+            style={[styles.actionButton, isNavigating && styles.actionButtonDisabled]} 
+            activeOpacity={0.7}
+            onPress={handleAddProduct}
+            disabled={isNavigating}
+          >
             <View style={[styles.actionIconContainer, { backgroundColor: COLORS.primary }]}>
               <Plus size={20} color={COLORS.background} />
             </View>
@@ -67,7 +84,12 @@ export default function DashboardScreen() {
             Add products to your store to start showcasing and selling to your customers.
           </Text>
           
-          <TouchableOpacity style={styles.primaryButton} activeOpacity={0.8} onPress={handleAddProduct}>
+          <TouchableOpacity 
+            style={[styles.primaryButton, isNavigating && styles.primaryButtonDisabled]} 
+            activeOpacity={0.8}
+            onPress={handleAddProduct}
+            disabled={isNavigating}
+          >
             <Text style={styles.primaryButtonText}>Add First Product</Text>
           </TouchableOpacity>
         </View>
@@ -153,6 +175,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.borderLight,
   },
+  actionButtonDisabled: {
+    opacity: 0.6,
+  },
   actionIconContainer: {
     width: 36,
     height: 36,
@@ -198,6 +223,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.xl,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  primaryButtonDisabled: {
+    opacity: 0.6,
   },
   primaryButtonText: {
     fontFamily: FONT.bold,
