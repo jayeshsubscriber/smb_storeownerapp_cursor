@@ -21,6 +21,7 @@ import {
   Mail,
   MapPin,
   Tag,
+  Trash2,
 } from 'lucide-react-native';
 
 // Mock customer suggestions
@@ -43,11 +44,13 @@ const mockProducts = [
     id: '1',
     name: 'Classic Wooden Building Blocks',
     price: 1299,
+    mrp: 1499,
   },
   {
     id: '2',
     name: 'Educational Science Kit',
     price: 2499,
+    mrp: 2999,
   },
 ];
 
@@ -58,6 +61,16 @@ const CUSTOMER_LABELS = [
   { id: 'new', label: 'New Customer', color: '#FFD166' },
   { id: 'vip', label: 'VIP', color: '#8338EC' },
 ];
+
+type ProductItem = {
+  id: string;
+  name: string;
+  price: number;
+  mrp: number;
+  quantity: number;
+  discount: number;
+  finalPrice: number;
+};
 
 export default function NewTransactionScreen() {
   // Customer Information State
@@ -72,12 +85,7 @@ export default function NewTransactionScreen() {
   const [address, setAddress] = useState('');
   
   // Product State
-  const [products, setProducts] = useState<Array<{
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
-  }>>([]);
+  const [products, setProducts] = useState<ProductItem[]>([]);
   const [productSearch, setProductSearch] = useState('');
   const [showProductSuggestions, setShowProductSuggestions] = useState(false);
   
@@ -95,24 +103,58 @@ export default function NewTransactionScreen() {
   const handleProductSelect = (product: typeof mockProducts[0]) => {
     setProducts([
       ...products,
-      { ...product, quantity: 1 }
+      {
+        ...product,
+        quantity: 1,
+        discount: 0,
+        finalPrice: product.price,
+      }
     ]);
     setProductSearch('');
     setShowProductSuggestions(false);
   };
 
-  // Calculate total amount
-  const calculateTotal = () => {
-    return products.reduce((total, product) => {
-      return total + (product.price * product.quantity);
-    }, 0);
-  };
-
   // Handle quantity change
   const handleQuantityChange = (id: string, quantity: number) => {
     setProducts(products.map(product =>
-      product.id === id ? { ...product, quantity } : product
+      product.id === id
+        ? {
+            ...product,
+            quantity,
+            finalPrice: calculateFinalPrice(product.price, product.discount, quantity)
+          }
+        : product
     ));
+  };
+
+  // Handle discount change
+  const handleDiscountChange = (id: string, discountText: string) => {
+    const discount = Number(discountText) || 0;
+    setProducts(products.map(product =>
+      product.id === id
+        ? {
+            ...product,
+            discount,
+            finalPrice: calculateFinalPrice(product.price, discount, product.quantity)
+          }
+        : product
+    ));
+  };
+
+  // Calculate final price after discount
+  const calculateFinalPrice = (price: number, discount: number, quantity: number) => {
+    const discountAmount = (price * discount) / 100;
+    return (price - discountAmount) * quantity;
+  };
+
+  // Calculate total amount
+  const calculateTotal = () => {
+    return products.reduce((total, product) => total + product.finalPrice, 0);
+  };
+
+  // Remove product
+  const handleRemoveProduct = (id: string) => {
+    setProducts(products.filter(product => product.id !== id));
   };
 
   // Handle label toggle
@@ -219,9 +261,14 @@ export default function NewTransactionScreen() {
                   onPress={() => handleProductSelect(product)}
                 >
                   <Text style={styles.suggestionName}>{product.name}</Text>
-                  <Text style={styles.suggestionPrice}>
-                    {formatPrice(product.price)}
-                  </Text>
+                  <View>
+                    <Text style={styles.suggestionMrp}>
+                      MRP: {formatPrice(product.mrp)}
+                    </Text>
+                    <Text style={styles.suggestionPrice}>
+                      Price: {formatPrice(product.price)}
+                    </Text>
+                  </View>
                 </TouchableOpacity>
               ))}
             </View>
@@ -229,35 +276,70 @@ export default function NewTransactionScreen() {
 
           {products.map((product) => (
             <View key={product.id} style={styles.productItem}>
-              <View style={styles.productInfo}>
+              <View style={styles.productHeader}>
                 <Text style={styles.productName}>{product.name}</Text>
-                <Text style={styles.productPrice}>
-                  {formatPrice(product.price)}
+                <TouchableOpacity
+                  style={styles.removeButton}
+                  onPress={() => handleRemoveProduct(product.id)}
+                >
+                  <Trash2 size={20} color={COLORS.error} />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.productPricing}>
+                <Text style={styles.mrpText}>
+                  MRP: {formatPrice(product.mrp)}
+                </Text>
+                <Text style={styles.priceText}>
+                  Price: {formatPrice(product.price)}
                 </Text>
               </View>
 
-              <View style={styles.quantityContainer}>
-                <TouchableOpacity
-                  style={styles.quantityButton}
-                  onPress={() => handleQuantityChange(
-                    product.id,
-                    Math.max(0, product.quantity - 1)
-                  )}
-                >
-                  <Text style={styles.quantityButtonText}>-</Text>
-                </TouchableOpacity>
+              <View style={styles.productControls}>
+                <View style={styles.quantityContainer}>
+                  <Text style={styles.controlLabel}>Quantity:</Text>
+                  <View style={styles.quantityControls}>
+                    <TouchableOpacity
+                      style={styles.quantityButton}
+                      onPress={() => handleQuantityChange(
+                        product.id,
+                        Math.max(1, product.quantity - 1)
+                      )}
+                    >
+                      <Text style={styles.quantityButtonText}>-</Text>
+                    </TouchableOpacity>
 
-                <Text style={styles.quantityText}>{product.quantity}</Text>
+                    <Text style={styles.quantityText}>{product.quantity}</Text>
 
-                <TouchableOpacity
-                  style={styles.quantityButton}
-                  onPress={() => handleQuantityChange(
-                    product.id,
-                    product.quantity + 1
-                  )}
-                >
-                  <Text style={styles.quantityButtonText}>+</Text>
-                </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.quantityButton}
+                      onPress={() => handleQuantityChange(
+                        product.id,
+                        product.quantity + 1
+                      )}
+                    >
+                      <Text style={styles.quantityButtonText}>+</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+
+                <View style={styles.discountContainer}>
+                  <Text style={styles.controlLabel}>Discount %:</Text>
+                  <TextInput
+                    style={styles.discountInput}
+                    value={product.discount.toString()}
+                    onChangeText={(text) => handleDiscountChange(product.id, text)}
+                    keyboardType="numeric"
+                    maxLength={2}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.productTotal}>
+                <Text style={styles.productTotalLabel}>Amount:</Text>
+                <Text style={styles.productTotalValue}>
+                  {formatPrice(product.finalPrice)}
+                </Text>
               </View>
             </View>
           ))}
@@ -313,11 +395,15 @@ export default function NewTransactionScreen() {
       {/* Add Transaction Button */}
       <View style={styles.footer}>
         <TouchableOpacity
-          style={styles.addButton}
+          style={[
+            styles.addButton,
+            (!products.length || !phone || !name) && styles.addButtonDisabled
+          ]}
           onPress={() => {
             // Handle transaction submission
             router.back();
           }}
+          disabled={!products.length || !phone || !name}
         >
           <Text style={styles.addButtonText}>Add Transaction</Text>
         </TouchableOpacity>
@@ -489,10 +575,18 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginTop: 2,
   },
+  suggestionMrp: {
+    fontFamily: FONT.regular,
+    fontSize: FONT.size.sm,
+    color: COLORS.textSecondary,
+    textDecorationLine: 'line-through',
+    textAlign: 'right',
+  },
   suggestionPrice: {
     fontFamily: FONT.bold,
     fontSize: FONT.size.md,
     color: COLORS.primary,
+    textAlign: 'right',
   },
   moreDetailsButton: {
     flexDirection: 'row',
@@ -514,7 +608,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.borderLight,
   },
-  productInfo: {
+  productHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -526,16 +620,44 @@ const styles = StyleSheet.create({
     fontSize: FONT.size.md,
     color: COLORS.text,
   },
-  productPrice: {
-    fontFamily: FONT.bold,
-    fontSize: FONT.size.md,
+  removeButton: {
+    padding: SPACING.xs,
+  },
+  productPricing: {
+    flexDirection: 'row',
+    marginBottom: SPACING.md,
+  },
+  mrpText: {
+    fontFamily: FONT.regular,
+    fontSize: FONT.size.sm,
+    color: COLORS.textSecondary,
+    textDecorationLine: 'line-through',
+    marginRight: SPACING.md,
+  },
+  priceText: {
+    fontFamily: FONT.medium,
+    fontSize: FONT.size.sm,
     color: COLORS.primary,
-    marginLeft: SPACING.md,
+  },
+  productControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  controlLabel: {
+    fontFamily: FONT.regular,
+    fontSize: FONT.size.sm,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xs,
   },
   quantityContainer: {
+    flex: 1,
+    marginRight: SPACING.md,
+  },
+  quantityControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-end',
   },
   quantityButton: {
     width: 32,
@@ -557,6 +679,39 @@ const styles = StyleSheet.create({
     marginHorizontal: SPACING.md,
     minWidth: 24,
     textAlign: 'center',
+  },
+  discountContainer: {
+    flex: 1,
+  },
+  discountInput: {
+    height: 32,
+    backgroundColor: COLORS.background,
+    borderRadius: BORDER_RADIUS.md,
+    paddingHorizontal: SPACING.sm,
+    fontFamily: FONT.medium,
+    fontSize: FONT.size.md,
+    color: COLORS.text,
+    textAlign: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  productTotal: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: SPACING.sm,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.borderLight,
+  },
+  productTotalLabel: {
+    fontFamily: FONT.medium,
+    fontSize: FONT.size.md,
+    color: COLORS.text,
+  },
+  productTotalValue: {
+    fontFamily: FONT.bold,
+    fontSize: FONT.size.md,
+    color: COLORS.primary,
   },
   totalContainer: {
     flexDirection: 'row',
@@ -620,6 +775,18 @@ const styles = StyleSheet.create({
       },
       default: {
         elevation: 2,
+      },
+    }),
+  },
+  addButtonDisabled: {
+    backgroundColor: COLORS.primaryLight,
+    opacity: 0.6,
+    ...Platform.select({
+      web: {
+        shadowOpacity: 0,
+      },
+      default: {
+        elevation: 0,
       },
     }),
   },
