@@ -50,7 +50,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="new-transaction"
         options={{
-          href: null,
           tabBarButton: () => (
             <View style={styles.fabContainer}>
               <TouchableOpacity 
