@@ -4,22 +4,26 @@ import {
   View,
   Text,
   TextInput,
-  ScrollView,
   TouchableOpacity,
+  ScrollView,
   Platform,
   Image,
+  Modal,
+  ActionSheetIOS,
 } from 'react-native';
 import { router } from 'expo-router';
+import { COLORS, FONT, SPACING, BORDER_RADIUS } from '@/constants/theme';
 import {
   ArrowLeft,
   Plus,
   X as Close,
   CircleAlert as AlertCircle,
   Upload,
+  Camera,
+  Image as ImageIcon,
 } from 'lucide-react-native';
-import { COLORS, FONT, SPACING, BORDER_RADIUS } from '@/constants/theme';
+import * as ImagePicker from 'expo-image-picker';
 
-// Predefined categories
 const CATEGORIES = [
   'Toys',
   'Clothing',
@@ -48,7 +52,6 @@ type FormErrors = {
 };
 
 export default function NewProductScreen() {
-  // Form state
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [sku, setSku] = useState('');
@@ -62,8 +65,8 @@ export default function NewProductScreen() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isDraft, setIsDraft] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showImagePickerModal, setShowImagePickerModal] = useState(false);
 
-  // Validation
   const validateForm = () => {
     const newErrors: FormErrors = {};
 
@@ -109,13 +112,11 @@ export default function NewProductScreen() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = async (asDraft: boolean = false) => {
     if (isSubmitting) return;
 
     if (asDraft) {
       setIsDraft(true);
-      // Save as draft logic here
       router.back();
       return;
     }
@@ -127,10 +128,8 @@ export default function NewProductScreen() {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Navigate to success screen with product details
       router.push({
         pathname: '/products/success',
         params: {
@@ -142,13 +141,75 @@ export default function NewProductScreen() {
       });
     } catch (error) {
       console.error('Error submitting product:', error);
-      // Handle error (show error message, etc.)
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Render error message
+  const pickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        setImages([...images, result.assets[0].uri]);
+      }
+    } catch (error) {
+      console.error('Error picking image:', error);
+    } finally {
+      setShowImagePickerModal(false);
+    }
+  };
+
+  const takePhoto = async () => {
+    try {
+      const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+      
+      if (cameraPermission.status !== 'granted') {
+        alert('Sorry, we need camera permissions to make this work!');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        setImages([...images, result.assets[0].uri]);
+      }
+    } catch (error) {
+      console.error('Error taking photo:', error);
+    } finally {
+      setShowImagePickerModal(false);
+    }
+  };
+
+  const handleImagePickerPress = () => {
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ['Cancel', 'Choose from Library', 'Take Photo'],
+          cancelButtonIndex: 0,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 1) {
+            pickImage();
+          } else if (buttonIndex === 2) {
+            takePhoto();
+          }
+        }
+      );
+    } else {
+      setShowImagePickerModal(true);
+    }
+  };
+
   const renderError = (field: string) => {
     if (!errors[field]) return null;
 
@@ -160,7 +221,42 @@ export default function NewProductScreen() {
     );
   };
 
-  // Render image picker
+  const renderImagePickerModal = () => (
+    <Modal
+      visible={showImagePickerModal}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={() => setShowImagePickerModal(false)}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <TouchableOpacity
+            style={styles.modalOption}
+            onPress={pickImage}
+          >
+            <ImageIcon size={24} color={COLORS.text} />
+            <Text style={styles.modalOptionText}>Choose from Gallery</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.modalOption}
+            onPress={takePhoto}
+          >
+            <Camera size={24} color={COLORS.text} />
+            <Text style={styles.modalOptionText}>Take Photo</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.modalOption, styles.cancelOption]}
+            onPress={() => setShowImagePickerModal(false)}
+          >
+            <Text style={[styles.modalOptionText, styles.cancelText]}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+
   const renderImagePicker = () => {
     return (
       <View style={styles.imagePickerContainer}>
@@ -183,10 +279,7 @@ export default function NewProductScreen() {
         {images.length < 5 && (
           <TouchableOpacity
             style={styles.addImageButton}
-            onPress={() => {
-              // Add image picker logic here
-              setImages([...images, 'https://images.pexels.com/photos/4226269/pexels-photo-4226269.jpeg']);
-            }}
+            onPress={handleImagePickerPress}
           >
             <Upload size={24} color={COLORS.primary} />
             <Text style={styles.addImageText}>Add Image</Text>
@@ -431,6 +524,7 @@ export default function NewProductScreen() {
           )}
         </TouchableOpacity>
       </View>
+      {renderImagePickerModal()}
     </View>
   );
 }
@@ -658,5 +752,38 @@ const styles = StyleSheet.create({
     animationDuration: '1s',
     animationIterationCount: 'infinite',
     animationTimingFunction: 'linear',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: COLORS.background,
+    borderTopLeftRadius: BORDER_RADIUS.xl,
+    borderTopRightRadius: BORDER_RADIUS.xl,
+    padding: SPACING.lg,
+  },
+  modalOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: SPACING.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
+  },
+  modalOptionText: {
+    fontFamily: FONT.medium,
+    fontSize: FONT.size.md,
+    color: COLORS.text,
+    marginLeft: SPACING.md,
+  },
+  cancelOption: {
+    justifyContent: 'center',
+    borderBottomWidth: 0,
+    marginTop: SPACING.sm,
+  },
+  cancelText: {
+    color: COLORS.error,
+    marginLeft: 0,
   },
 });
