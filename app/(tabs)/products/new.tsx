@@ -13,15 +13,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { COLORS, FONT, SPACING, BORDER_RADIUS } from '@/constants/theme';
-import {
-  ArrowLeft,
-  Plus,
-  X as Close,
-  CircleAlert as AlertCircle,
-  Upload,
-  Camera,
-  Image as ImageIcon,
-} from 'lucide-react-native';
+import { Circle, User } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 
 const CATEGORIES = [
@@ -215,7 +207,7 @@ export default function NewProductScreen() {
 
     return (
       <View style={styles.errorContainer}>
-        <AlertCircle size={16} color={COLORS.error} />
+        <Circle size={16} color={COLORS.error} />
         <Text style={styles.errorText}>{errors[field]}</Text>
       </View>
     );
@@ -234,7 +226,7 @@ export default function NewProductScreen() {
             style={styles.modalOption}
             onPress={pickImage}
           >
-            <ImageIcon size={24} color={COLORS.text} />
+            <User size={24} color={COLORS.text} />
             <Text style={styles.modalOptionText}>Choose from Gallery</Text>
           </TouchableOpacity>
 
@@ -242,7 +234,7 @@ export default function NewProductScreen() {
             style={styles.modalOption}
             onPress={takePhoto}
           >
-            <Camera size={24} color={COLORS.text} />
+            <User size={24} color={COLORS.text} />
             <Text style={styles.modalOptionText}>Take Photo</Text>
           </TouchableOpacity>
 
@@ -271,7 +263,7 @@ export default function NewProductScreen() {
                 setImages(newImages);
               }}
             >
-              <Close size={16} color={COLORS.error} />
+              <Circle size={16} color={COLORS.error} />
             </TouchableOpacity>
           </View>
         ))}
@@ -281,7 +273,7 @@ export default function NewProductScreen() {
             style={styles.addImageButton}
             onPress={handleImagePickerPress}
           >
-            <Upload size={24} color={COLORS.primary} />
+            <User size={24} color={COLORS.primary} />
             <Text style={styles.addImageText}>Add Image</Text>
           </TouchableOpacity>
         )}
@@ -297,7 +289,7 @@ export default function NewProductScreen() {
           onPress={() => router.back()}
           disabled={isSubmitting}
         >
-          <ArrowLeft size={24} color={COLORS.text} />
+          <Circle size={24} color={COLORS.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>New Product</Text>
       </View>

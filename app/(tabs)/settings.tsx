@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { COLORS, FONT, SPACING, BORDER_RADIUS } from '@/constants/theme';
-import { Store, User, Bell, Share2, CircleHelp as HelpCircle, LogOut, ChevronRight } from 'lucide-react-native';
+import { Store, User, Bell, Share2, Circle, LogOut, ChevronRight } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const settingsItems = [
@@ -32,7 +32,7 @@ export default function SettingsScreen() {
     {
       id: 'help',
       title: 'Help & Support',
-      icon: HelpCircle,
+      icon: Circle,
       iconBg: COLORS.primaryLight,
     },
   ];

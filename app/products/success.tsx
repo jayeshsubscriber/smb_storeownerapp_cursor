@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { COLORS, FONT, SPACING, BORDER_RADIUS } from '@/constants/theme';
-import { CircleCheck as CheckCircle2, Package, Plus, Chrome as Home } from 'lucide-react-native';
+import { Circle, User } from 'lucide-react-native';
 
 export default function ProductSuccessScreen() {
   const { name, sku, price, category } = useLocalSearchParams<{
@@ -32,7 +32,7 @@ export default function ProductSuccessScreen() {
     >
       <View style={styles.content}>
         <View style={styles.iconContainer}>
-          <CheckCircle2 size={64} color={COLORS.success} strokeWidth={1.5} />
+          <Circle size={64} color={COLORS.success} strokeWidth={1.5} />
         </View>
 
         <Text style={styles.title}>Product Added Successfully!</Text>
@@ -42,7 +42,7 @@ export default function ProductSuccessScreen() {
 
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <Package size={24} color={COLORS.primary} />
+            <User size={24} color={COLORS.primary} />
             <Text style={styles.cardTitle}>Product Details</Text>
           </View>
 
@@ -72,7 +72,7 @@ export default function ProductSuccessScreen() {
             style={[styles.button, styles.secondaryButton]} 
             onPress={handleAddAnother}
           >
-            <Plus size={20} color={COLORS.primary} />
+            <User size={20} color={COLORS.primary} />
             <Text style={styles.secondaryButtonText}>Add Another Product</Text>
           </TouchableOpacity>
 
@@ -80,7 +80,7 @@ export default function ProductSuccessScreen() {
             style={[styles.button, styles.primaryButton]} 
             onPress={handleViewProduct}
           >
-            <Package size={20} color={COLORS.background} />
+            <User size={20} color={COLORS.background} />
             <Text style={styles.primaryButtonText}>View Product</Text>
           </TouchableOpacity>
 
@@ -88,7 +88,7 @@ export default function ProductSuccessScreen() {
             style={[styles.button, styles.outlineButton]} 
             onPress={handleGoHome}
           >
-            <Home size={20} color={COLORS.textSecondary} />
+            <User size={20} color={COLORS.textSecondary} />
             <Text style={styles.outlineButtonText}>Go to Dashboard</Text>
           </TouchableOpacity>
         </View>

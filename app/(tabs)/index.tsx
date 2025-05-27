@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { COLORS, FONT, SPACING, BORDER_RADIUS } from '@/constants/theme';
-import { ShoppingBag, ChartBar as BarChart2, Tag, Share2, Plus } from 'lucide-react-native';
+import { ShoppingBag, BarChart2, Tag, Share2, Plus } from 'lucide-react-native';
 
 export default function DashboardScreen() {
   const [isNavigating, setIsNavigating] = useState(false);
