@@ -51,8 +51,7 @@ export default function TabLayout() {
         name="new-transaction"
         options={{
           href: null,
-          title: '',
-          tabBarIcon: () => (
+          tabBarButton: () => (
             <View style={styles.fabContainer}>
               <TouchableOpacity 
                 style={styles.fab} 
