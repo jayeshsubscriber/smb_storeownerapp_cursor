@@ -1,10 +1,15 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { router } from 'expo-router';
 import { COLORS, FONT, BORDER_RADIUS } from '@/constants/theme';
 import { Chrome as Home, ClipboardList, Settings, Package, Users, Plus } from 'lucide-react-native';
 
 export default function TabLayout() {
+  const handleNewTransaction = () => {
+    router.push('/new-transaction');
+  };
+
   return (
     <Tabs
       screenOptions={{
@@ -45,10 +50,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="new-transaction"
         options={{
+          href: null,
           title: '',
-          tabBarIcon: ({ color }) => (
+          tabBarIcon: () => (
             <View style={styles.fabContainer}>
-              <TouchableOpacity style={styles.fab} activeOpacity={0.8}>
+              <TouchableOpacity 
+                style={styles.fab} 
+                activeOpacity={0.8}
+                onPress={handleNewTransaction}
+              >
                 <Plus size={24} color={COLORS.background} />
               </TouchableOpacity>
             </View>
