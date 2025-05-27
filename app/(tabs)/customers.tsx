@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { COLORS, FONT, SPACING, BORDER_RADIUS } from '@/constants/theme';
-import { Search, Users, User } from 'lucide-react-native';
+import { Search, Users } from 'lucide-react-native';
 
 // Mock customer data
 const mockCustomers = [
@@ -94,10 +94,6 @@ export default function CustomersScreen() {
             style={styles.customerCard}
             activeOpacity={0.7}
           >
-            <View style={styles.avatarContainer}>
-              <User size={24} color={COLORS.textTertiary} />
-            </View>
-            
             <View style={styles.customerInfo}>
               <View style={styles.customerHeader}>
                 <Text style={styles.customerName}>{customer.name}</Text>
@@ -166,57 +162,51 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
   },
   customerCard: {
-    flexDirection: 'row',
     backgroundColor: COLORS.backgroundSecondary,
     borderRadius: BORDER_RADIUS.lg,
     marginBottom: SPACING.md,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: COLORS.borderLight,
-    padding: SPACING.md,
-  },
-  avatarContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: BORDER_RADIUS.round,
-    backgroundColor: COLORS.borderLight,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: SPACING.lg,
   },
   customerInfo: {
     flex: 1,
-    marginLeft: SPACING.md,
   },
   customerHeader: {
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.md,
+    paddingBottom: SPACING.md,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderLight,
   },
   customerName: {
     fontFamily: FONT.bold,
-    fontSize: FONT.size.md,
+    fontSize: FONT.size.lg,
     color: COLORS.text,
+    marginBottom: SPACING.xs,
   },
   customerPhone: {
     fontFamily: FONT.regular,
-    fontSize: FONT.size.sm,
+    fontSize: FONT.size.md,
     color: COLORS.textSecondary,
-    marginTop: 2,
   },
   customerStats: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   statItem: {
     flex: 1,
   },
   statLabel: {
     fontFamily: FONT.regular,
-    fontSize: FONT.size.xs,
+    fontSize: FONT.size.sm,
     color: COLORS.textTertiary,
-    marginBottom: 2,
+    marginBottom: SPACING.xs,
   },
   statValue: {
     fontFamily: FONT.medium,
-    fontSize: FONT.size.sm,
+    fontSize: FONT.size.md,
     color: COLORS.text,
   },
   amountValue: {
